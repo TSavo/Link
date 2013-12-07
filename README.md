@@ -45,5 +45,10 @@ The following Link op-codes are supported:
     03 Payload encoding
     04 Payload MD5
     05 Payload SHA-1
-    06 Keywords
+    06 Name
+    07 Description
+    08 Keywords
+    09 Author
+    10 URI
+    11 File name
     FF Next transaction in sequence
