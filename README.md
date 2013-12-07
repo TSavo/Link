@@ -26,7 +26,7 @@ For instance, the "payload" op-code is followed by two bytes which specify the s
 
 Here's a breakdown of an example "Payload" op-code in hexidecimal:
 
-    01021548656c6c6f20576f726c64
+    01021648656c6c6f20576f726c64
 
     01 <-- Payload op-code (always 2 bytes)
       02 <-- Number of Content length bytes (always 2 bytes)
