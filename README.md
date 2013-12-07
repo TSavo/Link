@@ -51,4 +51,5 @@ The following Link op-codes are supported:
     09 Author
     10 URI
     11 File name
+    FE Meta-data
     FF Next transaction in sequence
