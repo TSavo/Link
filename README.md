@@ -14,36 +14,35 @@ Link Transaction Format
 
 Link transactions contain a specific format, but are really just normal transactions with specially formatted addresses. This allows for normal blockchain operations in a Link transaction.
 
-Input sequences in Link are arbitrary, and are not used to encode data. Therefore any unspend inputs can be used. All Link transaction contains the following outputs:
+Input sequences in Link are arbitrary, and are not used to encode data. Therefore any unspend inputs can be used.
 
-0 or more normal spends, such as change spends.
-1 or more of the following sequences:
-  1 meta-data spends.
-  Between 0 and 9 data spends.
+Link transactions encode a series of op-codes into the addresses which can be parsed by the Link client. Each op code has 2 bytes (except for the Link Start Sequence op-code, which is 8 bytes), and may have additional bytes that follow it. In the instance where multiple bytes may follow an op-code, the op-code always encodes the number of bytes that follow it.
 
-It's important to note that the data spends always come immideately after the Meta-data spend in the sequence. This allow the transaction to do normal spending and change spending before or after including the Link data. By allowing multiple meta-data/data descriptions in a transaction, the data per transaction can grow to the maximum transaction size, and by allowing the meta-data to link to the next transaction in the sequence, multiple transaction spanning multiple blocks can form a single sequence of data.
+A Link spend sequence always starts with the Link Start Sequence op-code: 4c696e6b This must be the first 8 bytes in the spend address, and any spends which come after it are considered continuations of the Link sequence until a no-op op-code is reached (00).
 
-The first transaction in a sequence must always contain at least one Link output, which has the following address format:
+After the Link Start Sequence op-code, any op-codes may be used in any sequence, including multiple op-codes of the same type where appropiate. In the case of multiple op-codes, any data provided should be concatenated together unless otherwise specified.
 
-    42AABBCCDDEEFFGGHHII
-    
-    42 <-- Link Meta-Data
-      AA <-- First Data Segment Description
-        BB <-- Second Data Segment Description
-          CC <-- Third Data Segment Description
-            DD <-- Fourth Data Segment Description
-              EE <-- Fifth Data Segment Description
-                FF <-- Sixth Data Segment Description
-                  GG <-- Seventh Data Segment Description
-                    HH <-- Eighth Data Segment Description
-                      II <-- Ninth Data Segment Description
+For instance, the "payload" op-code is followed by two bytes which specify the size of the length field, followed by that length field which specifies the length of the content, followed by the content itself.
 
-Each data segment is the next spend in the transaction, and is essentially raw data, but by specifying it's description in the initial meta-data spend, this allows for the full 20 bytes to be used for the data itself while specifying what to do with the data.
+Here's a breakdown of an example "Payload" op-code in hexidecimal:
 
-The following table shows which codes represent which data type:
+    01021548656c6c6f20576f726c64
 
-    00 - No data (the spend isn't present, or should be ignored)
-    01 - Main Data (multiple will be concatenated together)
-    02 - Keywords (a null seperated list of UTF-8 encoded keywords, multiple are allowed)
-    03 - Next TXid (the first-bits of the next TX in the sequence, only one is allowed)
+    01 <-- Payload op-code (always 2 bytes)
+      02 <-- Number of Content length bytes (always 2 bytes)
+        16 <-- Content Length (2 bytes, as specified in the previous field. 22 in decimal)
+          48656c6c6f20576f726c64 <-- Actual content (22 bytes, as specified by the previous field)
 
+So to parse this, you would start by reading the first 2 bytes, and determining that this was a payload op-code. The next two bytes specify how many bytes will be used to encode the content length. Since the result is 2, the next two bytes are used to encode the actual content length. Since the result is 22 in binary (16 in hex), 22 more bytes follow that which are the actual content. The bytes that would immideately follow that must be another op-code.
+
+It's important to note that Link spends are always in sequence in the transaction This allow the transaction to do normal spending and change spending before or after including the Link data. By allowing an arbitrary number of op-codes to be encoded, the data per transaction can grow to the maximum transaction size, and by allowing op-codes which link to the next transaction in the sequence, multiple transaction spanning multiple blocks can form a single sequence of data.
+
+The following Link op-codes are supported:
+
+    4c696e6b Link Start Sequence
+    01 Payload
+    02 Payload disposition
+    03 Payload encoding
+    04 Payload MD5
+    05 Payload SHA-1
+    06 Keywords
