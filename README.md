@@ -16,9 +16,9 @@ Link transactions contain a specific format, but are really just normal transact
 
 Input sequences in Link are arbitrary, and are not used to encode data. Therefore any unspent inputs can be used.
 
-Link transactions encode a series of op-codes into the addresses which can be parsed by the Link client. Each op code starts with 2 bytes (except for the Link Start Sequence op-code, which is 8 bytes), and may have additional bytes that follow it. In the instance where a variable number of bytes may follow an op-code, the op-code always encodes the number of bytes that follow it. In the case where the number of bytes may be arbitarily large, the number of bytes that encode the content length are also encoded in the op-code.
-
 A Link spend sequence always starts with the Link Start Sequence op-code: 4c696e6b This must be the first 8 bytes in the spend address, and any spends which come after it are considered continuations of the Link sequence until a no-op op-code is reached (00).
+
+Link transactions encode a series of op-codes into the output addresses which can be parsed by the Link client. Each op code starts with 2 bytes (except for the Link Start Sequence op-code, which is 8 bytes), and may have additional bytes that follow it. In the instance where a variable number of bytes may follow an op-code, the op-code always encodes the number of bytes that follow it. In the case where the number of bytes may be arbitarily large, the number of bytes that encode the content length are also encoded in the op-code.
 
 After the Link Start Sequence op-code, any op-codes may be used in any sequence, including multiple op-codes of the same type where appropiate. In the case of multiple op-codes, any data provided should be concatenated together unless otherwise specified.
 
