@@ -87,7 +87,7 @@ Inline payloads are designed to be handled by the client by delegating to a prot
 
 This is the same as the inline payload, but instead of being executed as a protocol handler, the stream of bytes are expected to be saved to disk.
 
-*Op-code: 02
+* Op-code: 02
 * Operands: 3
 
 1. Operand 1: 2 bytes encoding operand 2 size X
