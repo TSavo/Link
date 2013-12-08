@@ -9,8 +9,7 @@ Link specifies a specific format for creating transactions which conform to the 
 
 Link describes how meta-data can be embedded along with the data, and how to store arbitrary amounts of data by linking transactions together in a sequence.
 
-Link Transaction Format
-====
+##Link Transaction Format
 
 Link transactions contain a specific format, but are really just normal transactions with specially formatted addresses. This allows for normal blockchain operations in a Link transaction.
 
@@ -69,10 +68,9 @@ The following Link op-codes are supported:
     F2 Replaces transaction
     FF Next transaction in sequence (required for multi-transaction sequences)
 
-Payload Op-Codes (0)
-====
+##Payload Op-Codes (0)
 
-Payload (inline disposition)
+###Payload (inline disposition)
 
 Payload is intended to be extracted from the data in accordance with the encoding and disposition. Multiple payload blocks are allowed, and the data should be concatenated together in the sequence it appears in the stream. This allows payload data to span outputs, transactions, and even blocks.
 
@@ -85,7 +83,7 @@ Operand 1: 2 bytes encoding operand 2 size X
 Operand 2: X bytes as specified by operand 1, encoding the length of the data Y
 Operand 3: Y bytes as specified by operand 2, encoding the payload
 
-Payload (attachment disposition)
+###Payload (attachment disposition)
 
 This is the same as the inline payload, but instead of being executed as a protocol handler, the stream of bytes are expected to be saved to disk.
 
@@ -96,7 +94,7 @@ Operand 1: 2 bytes encoding operand 2 size X
 Operand 2: X bytes as specified by operand 1, encoding the length of the data Y
 Operand 3: Y bytes as specified by operand 2, encoding the payload
 
-Payload mime-type
+###Payload mime-type
 
 This is the mime-type of the payload. The default encoding is "application/octet-stream".
 
@@ -106,11 +104,11 @@ Operands: 2
 Operand 1: 1 byte encoding operand 2 size X
 Operand 2: X bytes as specified by operand 1, encoding the payload mime-type
 
-Payload encoding
+###Payload encoding
 
 This is the type of encoding for the payload itself. The default encoding is "UTF-8", but others may be specified, like "base64".
 
-Payload MD5
+###Payload MD5
 
 The MD5 hash of the payload.
 
@@ -119,7 +117,7 @@ Operands: 1
 
 Operand 1: 16 bytes, the MD5 hash of the payload.
 
-Payload SHA-1
+###Payload SHA-1
 
 The SHA-1 hash of the payload.
 
@@ -128,7 +126,7 @@ Operands: 1
 
 Operand 1: 20 bytes, the SHA-1 hash of the payload
 
-Payload SHA-256
+###Payload SHA-256
 
 The SHA-256 hash of the payload.
 
@@ -137,7 +135,5 @@ Operands: 1
 
 Operand 1: 32 bytes, the SHA-256 hash of the payload
 
-
-Meta-data op-codes (1)
-====
+##Meta-data op-codes (1)
 
