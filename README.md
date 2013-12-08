@@ -59,6 +59,7 @@ The following Link op-codes are supported:
 | 15 |Original Creation Date (unix timestamp) |
 | 16 |Last Modified Date (unix timestamp) |
 | 1F |Arbitrary user-defined meta-data |
+| 2X |Reserved for Flux |
 | F1 |References transaction |
 | F2 |Replaces transaction |
 | FF |Next transaction in sequence (required for multi-transaction sequences) |
