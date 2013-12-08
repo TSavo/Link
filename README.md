@@ -76,64 +76,70 @@ Payload is intended to be extracted from the data in accordance with the encodin
 
 Inline payloads are designed to be handled by the client by delegating to a protocol handler.
 
-Op-code: 01
-Operands: 3
+*Op-code: 01
+*Operands: 3
 
-Operand 1: 2 bytes encoding operand 2 size X
-Operand 2: X bytes as specified by operand 1, encoding the length of the data Y
-Operand 3: Y bytes as specified by operand 2, encoding the payload
+1. Operand 1: 2 bytes encoding operand 2 size X
+2. Operand 2: X bytes as specified by operand 1, encoding the length of the data Y
+3. Operand 3: Y bytes as specified by operand 2, encoding the payload
 
 ###Payload (attachment disposition)
 
 This is the same as the inline payload, but instead of being executed as a protocol handler, the stream of bytes are expected to be saved to disk.
 
-Op-code: 02
-Operands: 3
+*Op-code: 02
+*Operands: 3
 
-Operand 1: 2 bytes encoding operand 2 size X
-Operand 2: X bytes as specified by operand 1, encoding the length of the data Y
-Operand 3: Y bytes as specified by operand 2, encoding the payload
+1. Operand 1: 2 bytes encoding operand 2 size X
+2. Operand 2: X bytes as specified by operand 1, encoding the length of the data Y
+3. Operand 3: Y bytes as specified by operand 2, encoding the payload
 
 ###Payload mime-type
 
 This is the mime-type of the payload. The default encoding is "application/octet-stream".
 
-Op-code: 03
-Operands: 2
+*Op-code: 03
+*Operands: 2
 
-Operand 1: 1 byte encoding operand 2 size X
-Operand 2: X bytes as specified by operand 1, encoding the payload mime-type
+1. Operand 1: 1 byte encoding operand 2 size X
+2. Operand 2: X bytes as specified by operand 1, encoding the payload mime-type
 
 ###Payload encoding
 
 This is the type of encoding for the payload itself. The default encoding is "UTF-8", but others may be specified, like "base64".
 
+*Op-code: 04
+*Operands: 2
+
+1. Operand 1: 1 byte encoding operand 2 size X
+2. Operand 2: X bytes as specified by operand 1, encoding the payload encoding
+
 ###Payload MD5
 
 The MD5 hash of the payload.
 
-Op-code: 04
-Operands: 1
+*Op-code: 05
+*Operands: 1
 
-Operand 1: 16 bytes, the MD5 hash of the payload.
+1. Operand 1: 16 bytes, the MD5 hash of the payload.
 
 ###Payload SHA-1
 
 The SHA-1 hash of the payload.
 
-Op-code: 05
-Operands: 1
+*Op-code: 06
+*Operands: 1
 
-Operand 1: 20 bytes, the SHA-1 hash of the payload
+1. Operand 1: 20 bytes, the SHA-1 hash of the payload
 
 ###Payload SHA-256
 
 The SHA-256 hash of the payload.
 
-Op-code: 06
-Operands: 1
+*Op-code: 07
+*Operands: 1
 
-Operand 1: 32 bytes, the SHA-256 hash of the payload
+1. Operand 1: 32 bytes, the SHA-256 hash of the payload
 
 ##Meta-data op-codes (1)
 
