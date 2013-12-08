@@ -68,6 +68,6 @@ The following Link op-codes are supported:
     FF Next transaction in sequence (required for multi-transaction sequences)
 
 Payload
-==
+=
 
 01
