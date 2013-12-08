@@ -40,16 +40,34 @@ It's important to note that Link spends are always in sequence in the transactio
 The following Link op-codes are supported:
 
     4c696e6b Link Start Sequence
+  
+    No-op: 00
+    
+    Payload opcodes: 0
     01 Payload
     02 Payload disposition
     03 Payload encoding
     04 Payload MD5
     05 Payload SHA-1
-    06 Name
-    07 Description
-    08 Keywords
-    09 Author
-    10 URI
-    11 File name
-    FE Meta-data
-    FF Next transaction in sequence
+    
+    Meta-data opcodes: 1
+    10 Name
+    11 Description
+    12 Keywords
+    13 Author
+    14 URI
+    15 File name
+    16 Original Creation Date (unix timestamp)
+    17 Last Modified Date (unix timestamp)
+    1F Arbitrary user-defined meta-data
+    
+    Sequencing opcodes:
+    F0 Previous transaction in sequence (optional)
+    F1 References transaction
+    F2 Replaces transaction
+    FF Next transaction in sequence (required for multi-transaction sequences)
+
+Payload
+===
+
+01
