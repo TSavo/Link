@@ -17,21 +17,22 @@ Link transactions contain a specific format, but are really just normal transact
 
 Input sequences in Link are arbitrary, and are not used to encode data. Therefore any unspent inputs can be used.
 
-A Link spend sequence always starts with the Link Start Sequence op-code: 4c696e6b This must be the first 8 bytes in the spend address, and any spends which come after it are considered continuations of the Link sequence until a no-op op-code is reached (00).
+A Link spend sequence always starts with the Link Start Sequence op-code: "4c 69 6e 6b"
 
-Link transactions encode a series of op-codes into the output addresses which can be parsed by the Link client. Each op code starts with 2 bytes, and may have additional bytes that follow it. In the instance where a variable number of bytes may follow an op-code, the op-code always encodes the number of bytes that follow it. In the case where the number of bytes may be arbitarily large, the number of bytes that encode the content length are also encoded in the op-code.
+This must be the first 4 bytes in the spend address, and any spends which come after it are considered continuations of the Link sequence until a no-op op-code is reached (00).
 
-After the Link Start Sequence op-code, any op-codes may be used in any sequence, including multiple op-codes of the same type where appropiate. In the case of multiple op-codes, any data provided should be concatenated together unless otherwise specified.
+Link transactions encode a series of op-codes into the output addresses which can be parsed by the Link client. Each op code starts with 1 byte, and may have additional bytes that follow it. In the instance where a variable number of bytes may follow an op-code, the op-code always encodes the number of bytes that follow it.
 
-For instance, the "payload" op-code is followed by two bytes which specify the size of the length field, followed by that length field which specifies the length of the content, followed by the content itself.
+After the Link Start Sequence op-code, any op-codes may be used in any sequence, including multiple op-codes of the same type where appropiate. In the case of multiple op-codes, any data provided should be concatenated together unless otherwise specified. Since all size fields are 1 bytes, the maximum size for a operand will be 65,535, so it's necessary to repeat a "payload" op code to encode more than 65,535 bytes in a sequence. 
+
+For instance, the "payload" op-code is followed by two bytes which specify the length of the content, followed by the content itself.
 
 Here's a breakdown of an example "Payload" op-code in hexidecimal:
 
-    01 16 48 65 6c 6c 6f 20 57 6f 72 6c 64
-    ^^ Payload op-code (always 2 bytes)
-       ^^ Content Length (2 bytes. 22 in decimal)
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-          Actual content (22 bytes, as specified by the previous field)
+    01 0B 48 65 6c 6c 6f 20 57 6f 72 6c 64
+    ^^ Payload op-code (1 bytes)
+       ^^ Content Length (1 byte. 22 in decimal)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Actual content (11 bytes, as specified by the previous field)
 
 So to parse this, you would start by reading the first 2 bytes, and determining that this was a payload op-code. The next two bytes specify how many bytes will be used to encode the content length. Since the result is 2, the next two bytes are used to encode the actual content length. Since the result is 22 in binary (16 in hex), 22 more bytes follow that which are the actual content. The bytes that would immideately follow that must be another op-code.
 
@@ -53,11 +54,10 @@ The following Link op-codes are supported:
 | 10 |Name |
 | 11 |Description |
 | 12 |Keywords |
-| 13 |Author |
-| 14 |URI |
-| 15 |File name |
-| 16 |Original Creation Date (unix timestamp) |
-| 17 |Last Modified Date (unix timestamp) |
+| 13 |URI |
+| 14 |File name |
+| 15 |Original Creation Date (unix timestamp) |
+| 16 |Last Modified Date (unix timestamp) |
 | 1F |Arbitrary user-defined meta-data |
 | F1 |References transaction |
 | F2 |Replaces transaction |
@@ -175,7 +175,25 @@ The file name of the attachment payload.
  1. 2 bytes, the size of the file name X
  2. X bytes as specified by operand 1, the URI associated with this sequence.
   
- 
-| 15 |File name |
-| 16 |Original Creation Date (unix timestamp) |
-| 17 |Last Modified Date (unix timestamp) |
+###Original Creation Date (unix timestamp)
+
+The Unix timestamp of the original creation date.
+
+* Op-code: 15
+* Operands: 1
+ 1. 4 bytes, the unix timestamp of the original creation date
+
+###Last Modified Date (unix timestamp)
+
+* Op-code: 16
+* Operands: 1
+ 1. 4 bytes, the unix timestamp of the last modified date
+
+###Arbitrailly defined Meta-data
+
+A "free form field" for unformatted meta-data.
+
+* Op-code: 1F
+* Operands: 2
+ 1. 2 bytes, the size of the meta-data X
+ 2. X bytes as defined by operand 1, the meta-data
