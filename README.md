@@ -31,7 +31,7 @@ Here's a breakdown of an example "Payload" op-code in hexidecimal:
 
     01 0B 48 65 6c 6c 6f 20 57 6f 72 6c 64
     ^^ Payload op-code (1 bytes)
-       ^^ Content Length (1 byte. 22 in decimal)
+       ^^ Content Length (1 byte. 11 in decimal)
           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Actual content (11 bytes, as specified by the previous field)
 
 So to parse this, you would start by reading the first 2 bytes, and determining that this was a payload op-code. The next two bytes specify how many bytes will be used to encode the content length. Since the result is 2, the next two bytes are used to encode the actual content length. Since the result is 22 in binary (16 in hex), 22 more bytes follow that which are the actual content. The bytes that would immideately follow that must be another op-code.
@@ -74,9 +74,8 @@ Inline payloads are designed to be handled by the client by delegating to a prot
 
 * Op-code: 01
 * Operands: 3
- 1. 2 bytes encoding operand 2 size X
- 2. X bytes as specified by operand 1, encoding the length of the data Y
- 3. Y bytes as specified by operand 2, encoding the payload
+ 1. 2 bytes encoding payload size X
+ 2. X bytes as specified by operand 1, encoding the payload
 
 ###Payload (attachment disposition)
 
@@ -198,3 +197,74 @@ A "free form field" for unformatted meta-data.
 * Operands: 2
  1. 2 bytes, the size of the meta-data X
  2. X bytes as defined by operand 1, the meta-data
+
+##Sequencing op-codes (F)
+
+Sequencing allows a Link sequence to span multiple transactions.
+
+###References transaction
+
+This sequence is in reply to or reference another transaction.
+
+* Op-code: F0
+* Operands: 1
+ 1. 32 bytes, the id of the tx being references
+
+##Replaces transaction
+
+This sequence superceeds another transaction.
+
+* Op-code: F1
+* Operands: 1
+ 1. 32 bytes, the id of the tx being references
+
+##Next transaction in sequence
+
+This allows for multi-transaction sequences. By referencing another transaction which also has a Link sequence embedded in it, both transactions are considered included in the sequence.
+
+* Op-code: FF
+* Operands: 1
+ 1. 32 bytes, the id of the tx that continues this sequence
+
+##Example sequences
+
+###Basic file encoding
+
+Here we're encoding a file with the following properties:
+Attachment Payload: "Hello World" (48 65 6c 6c 6f 20 57 6f 72 6c 64, 11 bytes)
+Filename: "greeting.txt" (67 72 65 65 74 69 6e 67 2e 74 78 74, 10 bytes)
+Created date: 12/08/2013 @ 7:29am (1386487795 unix timestamp, 52 A4 1F F3, 4 bytes)
+Last Modified date: 12/08/2013 @ 7:32am (1386487972 unix timestamp, 52 A4 20 A4, 4 bytes)
+
+The raw stream to encode this is:
+
+'''
+4c 69 6e 6b 02 0B 48 65 6c 6c 6f 20 57 6f 72 6c 64 14 0A 67 72 65 65 74 69 6e 67 2e 74 78 74 15 52 A4 1F F3 16 52 A4 20 A4 00
+'''
+
+Broken out:
+
+'''
+4c 69 6e 6b 02 0B 48 65 6c 6c 6f 20 57 6f 72 6c 64
+^^^^^^^^^^^ Link Sequence op-code
+            ^^ Payload op-code (1 bytes)
+               ^^ Content length (1 byte. 11 in decimal)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Actual content (11 bytes, as specified by the previous field)
+
+14 0A 67 72 65 65 74 69 6e 67 2e 74 78 74
+^^ Filename op-code (1 byte)
+   ^^ Content length (1 byte)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Actual content (10 bytes)
+      
+15 52 A4 1F F3 16 52 A4 20 A4 00
+^^ Original creation date op-code (1 byte)
+   ^^^^^^^^^^^ Created on unix timestamp (4 bytes)
+               ^^ Last modified date op-code (1 byte)
+                  ^^^^^^^^^^^ Last modified unix timestamp (4 bytes)
+                              ^^ End sequence op-code
+   
+
+'''
+
+
+
