@@ -243,15 +243,15 @@ Last Modified date: 12/08/2013 @ 7:32am (1386487972 unix timestamp, 52 A4 20 A4,
 
 The raw stream to encode this is:
 
-'''
+```
 
 4c 69 6e 6b 02 0B 48 65 6c 6c 6f 20 57 6f 72 6c 64 14 0A 67 72 65 65 74 69 6e 67 2e 74 78 74 15 52 A4 1F F3 16 52 A4 20 A4 00
 
-'''
+```
 
 Broken out:
 
-'''
+```
 
 4c 69 6e 6b 02 0B 48 65 6c 6c 6f 20 57 6f 72 6c 64
 ^^^^^^^^^^^ Link Sequence op-code
@@ -272,7 +272,7 @@ Broken out:
                               ^^ End sequence op-code
    
 
-'''
+```
 
 
 
