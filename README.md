@@ -27,12 +27,11 @@ For instance, the "payload" op-code is followed by two bytes which specify the s
 
 Here's a breakdown of an example "Payload" op-code in hexidecimal:
 
-    01 02 16 48 65 6c 6c 6f 20 57 6f 72 6c 64
+    01 16 48 65 6c 6c 6f 20 57 6f 72 6c 64
     ^^ Payload op-code (always 2 bytes)
-       ^^ Number of Content length bytes (always 2 bytes)
-          ^^ Content Length (2 bytes, as specified in the previous field. 22 in decimal)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-              Actual content (22 bytes, as specified by the previous field)
+       ^^ Content Length (2 bytes. 22 in decimal)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          Actual content (22 bytes, as specified by the previous field)
 
 So to parse this, you would start by reading the first 2 bytes, and determining that this was a payload op-code. The next two bytes specify how many bytes will be used to encode the content length. Since the result is 2, the next two bytes are used to encode the actual content length. Since the result is 22 in binary (16 in hex), 22 more bytes follow that which are the actual content. The bytes that would immideately follow that must be another op-code.
 
@@ -83,11 +82,10 @@ Inline payloads are designed to be handled by the client by delegating to a prot
 This is the same as the inline payload, but instead of being executed as a protocol handler, the stream of bytes are expected to be saved to disk.
 
 * Op-code: 02
-* Operands: 3
+* Operands: 2
  1. 2 bytes encoding operand 2 size X
- 2. X bytes as specified by operand 1, encoding the length of the data Y
- 3. Y bytes as specified by operand 2, encoding the payload
-
+ 2. X bytes as specified by operand 1, encoding the payload
+ 
 ###Payload mime-type
 
 This is the mime-type of the payload. The default encoding is "application/octet-stream".
@@ -103,7 +101,7 @@ This is the type of encoding for the payload itself. The default encoding is "UT
 
 * Op-code: 04
 * Operands: 2
- 1. 1 byte encoding operand 2 size X
+ 1. 1 byte encoding the payload encoding string size X
  2. X bytes as specified by operand 1, encoding the payload encoding
 
 ###Payload MD5
@@ -132,3 +130,52 @@ The SHA-256 hash of the payload.
 
 ##Meta-data op-codes (1)
 
+###Name
+
+The name of the sequence.
+
+* Op-code: 10
+* Operands: 2
+ 1. 2 bytes, the size of the file name X
+ 2. X bytes as specified by operand 1, the name of the sequence
+
+###Description
+
+The description of the sequence.
+
+* Op-code: 11
+* Operands: 2
+ 1. 2 bytes, the size of the description X
+ 2. X bytes as specified by operand 1, the description of the sequence
+
+###Keywords
+
+The keywords to index quick searches by. Expected to be a comma seperated list.
+
+* Op-code: 12
+* Operands: 2
+ 1. 2 bytes, the size of the keywords X
+ 2. X bytes as specified by operand 1, the keywords
+
+###URI
+
+The URI that is associated with this sequence.
+
+* Op-code: 13
+* Operands: 2
+ 1. 2 bytes, the size of the URI X
+ 2. X bytes as specified by operand 1, the URI associated with this sequence
+
+###File Name
+
+The file name of the attachment payload. 
+
+* Op-code: 14
+* Operands: 2
+ 1. 2 bytes, the size of the file name X
+ 2. X bytes as specified by operand 1, the URI associated with this sequence.
+  
+ 
+| 15 |File name |
+| 16 |Original Creation Date (unix timestamp) |
+| 17 |Last Modified Date (unix timestamp) |
