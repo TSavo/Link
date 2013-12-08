@@ -40,27 +40,29 @@ It's important to note that Link spends are always in sequence in the transactio
 
 The following Link op-codes are supported:
 
-|4c696e6b|Link Start Sequence|
-|No-op|00|
-|01|Payload (inline)|
-|02|Payload (attachment)|
-|03|Payload mime-type|
-|04|Payload encoding|
-|05|Payload MD5|
-|06|Payload SHA-1|
-|07|Payload SHA-256|
-|10|Name|
-|11|Description|
-|12|Keywords|
-|13|Author|
-|14|URI|
-|15|File name|
-|16|Original Creation Date (unix timestamp)|
-|17|Last Modified Date (unix timestamp)|
-|1F|Arbitrary user-defined meta-data|
-|F1|References transaction|
-|F2|Replaces transaction|
-|FF|Next transaction in sequence (required for multi-transaction sequences)|
+| Op Code (in hex) | Operation |
+| -----------------:|:------------------------------- |
+| 4c696e6b | Link Start Sequence |
+| No-op/End-sequence | 00 |
+| 01 | Payload (inline) |
+| 02 |Payload (attachment) |
+| 03 |Payload mime-type |
+| 04 |Payload encoding |
+| 05 |Payload MD5 |
+| 06 |Payload SHA-1 |
+| 07 |Payload SHA-256 |
+| 10 |Name |
+| 11 |Description |
+| 12 |Keywords |
+| 13 |Author |
+| 14 |URI |
+| 15 |File name |
+| 16 |Original Creation Date (unix timestamp) |
+| 17 |Last Modified Date (unix timestamp) |
+| 1F |Arbitrary user-defined meta-data |
+| F1 |References transaction |
+| F2 |Replaces transaction |
+| FF |Next transaction in sequence (required for multi-transaction sequences) |
 
 ##Payload Op-Codes (0)
 
