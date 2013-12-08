@@ -41,9 +41,9 @@ It's important to note that Link spends are always in sequence in the transactio
 The following Link op-codes are supported:
 
 | Op Code (in hex) | Operation |
-| -----------------:|:------------------------------- |
+| -----------:|:------------------------------- |
 | 4c696e6b | Link Start Sequence |
-| No-op/End-sequence | 00 |
+| No-op/End| 00 |
 | 01 | Payload (inline) |
 | 02 |Payload (attachment) |
 | 03 |Payload mime-type |
