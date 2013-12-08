@@ -9,6 +9,8 @@ Link specifies a specific format for creating transactions which conform to the 
 
 Link describes how meta-data can be embedded along with the data, and how to store arbitrary amounts of data by linking transactions together in a sequence.
 
+Link is designed as a protocol that rides on top of existing blockchain protocols, and it purposefully does NOT specify the rules for usage, only the suggested message types, called op-codes. It's entirely up to the message creator, and the consuming client for how to intrepret the information present. It's implied that any message type can be repeated multiple times, and in fact for multi-transaction messages, this is a requirement of the parser.
+
 ##Link Transaction Format
 
 Link transactions contain a specific format, but are really just normal transactions with specially formatted addresses. This allows for normal blockchain operations in a Link transaction.
@@ -17,7 +19,7 @@ Input sequences in Link are arbitrary, and are not used to encode data. Therefor
 
 A Link spend sequence always starts with the Link Start Sequence op-code: 4c696e6b This must be the first 8 bytes in the spend address, and any spends which come after it are considered continuations of the Link sequence until a no-op op-code is reached (00).
 
-Link transactions encode a series of op-codes into the output addresses which can be parsed by the Link client. Each op code starts with 2 bytes (except for the Link Start Sequence op-code, which is 8 bytes), and may have additional bytes that follow it. In the instance where a variable number of bytes may follow an op-code, the op-code always encodes the number of bytes that follow it. In the case where the number of bytes may be arbitarily large, the number of bytes that encode the content length are also encoded in the op-code.
+Link transactions encode a series of op-codes into the output addresses which can be parsed by the Link client. Each op code starts with 2 bytes, and may have additional bytes that follow it. In the instance where a variable number of bytes may follow an op-code, the op-code always encodes the number of bytes that follow it. In the case where the number of bytes may be arbitarily large, the number of bytes that encode the content length are also encoded in the op-code.
 
 After the Link Start Sequence op-code, any op-codes may be used in any sequence, including multiple op-codes of the same type where appropiate. In the case of multiple op-codes, any data provided should be concatenated together unless otherwise specified.
 
@@ -25,12 +27,12 @@ For instance, the "payload" op-code is followed by two bytes which specify the s
 
 Here's a breakdown of an example "Payload" op-code in hexidecimal:
 
-    01021648656c6c6f20576f726c64
-
-    01 <-- Payload op-code (always 2 bytes)
-      02 <-- Number of Content length bytes (always 2 bytes)
-        16 <-- Content Length (2 bytes, as specified in the previous field. 22 in decimal)
-          48656c6c6f20576f726c64 <-- Actual content (22 bytes, as specified by the previous field)
+    01 02 16 48 65 6c 6c 6f 20 57 6f 72 6c 64
+    ^^ Payload op-code (always 2 bytes)
+       ^^ Number of Content length bytes (always 2 bytes)
+          ^^ Content Length (2 bytes, as specified in the previous field. 22 in decimal)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+              Actual content (22 bytes, as specified by the previous field)
 
 So to parse this, you would start by reading the first 2 bytes, and determining that this was a payload op-code. The next two bytes specify how many bytes will be used to encode the content length. Since the result is 2, the next two bytes are used to encode the actual content length. Since the result is 22 in binary (16 in hex), 22 more bytes follow that which are the actual content. The bytes that would immideately follow that must be another op-code.
 
@@ -38,35 +40,27 @@ It's important to note that Link spends are always in sequence in the transactio
 
 The following Link op-codes are supported:
 
-    4c696e6b Link Start Sequence
-  
-    No-op: 00
-    
-    Payload opcodes: 0
-    01 Payload (inline)
-    02 Payload (attachment)
-    03 Payload mime-type
-    04 Payload encoding
-    05 Payload MD5
-    06 Payload SHA-1
-    07 Payload SHA-256
-    
-    Meta-data opcodes: 1
-    10 Name
-    11 Description
-    12 Keywords
-    13 Author
-    14 URI
-    15 File name
-    16 Original Creation Date (unix timestamp)
-    17 Last Modified Date (unix timestamp)
-    1F Arbitrary user-defined meta-data
-    
-    Sequencing opcodes:
-    F0 Previous transaction in sequence (optional)
-    F1 References transaction
-    F2 Replaces transaction
-    FF Next transaction in sequence (required for multi-transaction sequences)
+|4c696e6b|Link Start Sequence|
+|No-op|00|
+|01|Payload (inline)|
+|02|Payload (attachment)|
+|03|Payload mime-type|
+|04|Payload encoding|
+|05|Payload MD5|
+|06|Payload SHA-1|
+|07|Payload SHA-256|
+|10|Name|
+|11|Description|
+|12|Keywords|
+|13|Author|
+|14|URI|
+|15|File name|
+|16|Original Creation Date (unix timestamp)|
+|17|Last Modified Date (unix timestamp)|
+|1F|Arbitrary user-defined meta-data|
+|F1|References transaction|
+|F2|Replaces transaction|
+|FF|Next transaction in sequence (required for multi-transaction sequences)|
 
 ##Payload Op-Codes (0)
 
