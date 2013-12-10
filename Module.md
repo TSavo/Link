@@ -13,7 +13,7 @@ Before a module can be used, an open slot and functions must be associated with 
 # Opcode Examples
 ## Reserved or Required Slot Opcodes:
  * Specify a reserved opcode, such as 00 - 0F or F0 - FF.
- * Or instead or a required opcode, such as 10 - 1F.
+ * Or instead specify a required opcode, such as 10 - 1F.
  * Follow the opcode with data for the opcode.
  * Opcodes and data may be used at any time.
 
