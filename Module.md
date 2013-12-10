@@ -34,5 +34,3 @@ Before a module can be used, an open slot and functions must be associated with 
  * Signatures must be unique for each module.
  * Signatures can be used in more than one slot.
  * Switched out modules are put into hibernation until resumed.
-
-
