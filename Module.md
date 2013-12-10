@@ -2,7 +2,7 @@
 Modules allow the Link Filesharing Protocol to be extended to other uses. Each module is assigned a unique identifier to distinguish it from other modules. Each module also has a collection of opcodes set aside for that identifier. The opcodes specify a slot index and a function number.
 
 # Slots
-There are 16 slots allowing for 16 modules to be active at the same time. Each slot has 16 function numbers for descriptions, strings, or other data. Exception in the reserved and required slots, function F of each slot contains the unique identifier for that module. This allows modules to use more than one slot so that it can have more than the 16 functions of a single slot.
+There are 16 slots allowing for 16 modules to be active at the same time. Each slot has 16 function numbers for descriptions, strings, or other data. Except in the reserved and required slots, function F of each slot contains the unique identifier for that module. This allows modules to use more than one slot so that it can have more than the 16 functions of a single slot.
 
 # Reserved and Required Slots
 The Link protocol reserves two slots at indices 0 and F. Opcodes 00 through 0F are in slot 0, which is reserved for the core module. Opcodes F0 through FF are in slot F, which is reserved for the sequencing module. The Link protocol also requires the meta-data module to be assigned at slot 1, providing opcodes 10 through 1F.
