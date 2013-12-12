@@ -240,13 +240,45 @@ class LinkSequenceDecoder
           payload = decodeBuffer(sequence, ip)
           ip += payload[0]
           @payloadAttachment = payload[1]
+        when payloadMD5OpCode
+          payload = decodeBytes(sequence, ip, 16)
+          op += payload[0]
+          @payloadMD5 = payload[1].toString("hex")
+        when payloadSHA1OpCode
+          payload = decodeBytes(sequence, ip, 20)
+          ip += payload[0]
+          @payloadSHA1 = payload[1].toString("hex")
         when payloadSHA256OpCode
           payload = decodeBytes(sequence, ip, 32)
           ip += payload[0]
           @payloadSHA256 = payload[1].toString("hex")
         when endSequence
           running = false
-
+  verify: ->
+    errors = []
+    p = @payloadAttachment
+    if not p then p = @payloadInline
+    if not p? then return
+    if @payloadMD5?
+      h = hashBuffer "md5", p
+      if(h != @payloadMD5)
+        errors.push("Expected MD5 was #{@payloadMD5} but the payload MD5 is #{h}")
+    if @payloadSHA1?
+      h = hashBuffer "sha1", p
+      if(h != @payloadSHA1)
+        errors.push("Expected SHA-1 was #{@payloadSHA1} but the payload SHA-1 is #{h}")
+    if @payloadSHA256?
+      h = hashBuffer "sha256", p
+      if(h != @payloadSHA256)
+        errors.push("Expected SHA-256 was #{@payloadSHA256} but the payload SHA-256 is #{h}")
+    errors       
+    
+hashBuffer = (algo, buffer) ->
+  hash = crypto.createHash algo
+  hash.update buffer
+  return hash.digest().toString("hex")
+  
+    
 
 fs = require("fs")
 readline = require("readline")
@@ -270,6 +302,9 @@ rl.question "What is the magnet link? ", (magnet) ->
         new Buffer(bytesToHex(decodeBase58(addresses[x]).slice(1)), "hex").copy decodedBuf, x * 20
       console.log decodedBuf.toString("hex")
       decoder = new LinkSequenceDecoder(decodedBuf)
+      errors = decoder.verify()
+      if errors.length > 0
+        console.log error for error in errors
       console.log decoder.payloadInline
       console.log decoder.name
       console.log decoder.keywords
