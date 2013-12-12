@@ -130,7 +130,9 @@ encodePayloadEncoding = (str) ->
 encodePayloadMD5Buffer = (buf) ->
   hash = crypto.createHash("md5")
   hash.update buf
-  payloadMD5OpCode + hash.digest().toString("hex")
+  v = hash.digest().toString("hex")
+  console.log v.length
+  payloadMD5OpCode + v
 encodePayloadSHA1Buffer = (buf) ->
   hash = crypto.createHash("sha1")
   hash.update buf
@@ -138,9 +140,7 @@ encodePayloadSHA1Buffer = (buf) ->
 encodePayloadSHA256Buffer = (buf) ->
   hash = crypto.createHash("sha256")
   hash.update buf
-  s = hash.digest()
-  console.log s.length
-  payloadSHA256OpCode + s.toString "hex"
+  payloadSHA256OpCode + hash.digest().toString("hex")
 encodeName = (str) ->
   nameOpCode + encodeString(str)
 encodeDescription = (str) ->
@@ -201,13 +201,26 @@ class LinkSequenceBuilder
     @str + endSequence
   addName: (name) ->
     @str += encodeName(name)
+  addDescription: (description) ->
+    @str += encodeDescription description
+  addURI: (uri) ->
+    @str += encodeURI uri
+  addFilename: (filename) ->
+    @str += encodeFilename filename
+  addMimeType: (mimeType) ->
+    @str += encodeMimeType mimeType
   addKeywords: (keywords) ->
     @str += encodeKeywords(keywords)
   addPayloadInline: (payload) ->
-    @str += encodePayloadInline(payload)
-    @str += encodePayloadSHA256Buffer(payload)
+    @str += encodePayloadInline payload
   addPayloadAttachment: (buf) ->
-    @str += encodePayloadAttachment(buf)
+    @str += encodePayloadAttachment buf
+  addPayloadMD5: (buf) ->
+    @str += encodePayloadMD5Buffer buf
+  addPayloadSHA1: (buf) ->
+    @str += encodePayloadSHA1Buffer buf
+  addPayloadSHA256: (buf) ->
+    @str += encodePayloadSHA256Buffer buf
 
 class LinkSequenceDecoder
   constructor: (@sequence) ->
@@ -236,13 +249,25 @@ class LinkSequenceDecoder
           payload = decodeString(sequence, ip)
           ip += payload[0]
           @keywords = payload[1]
+        when descriptionOpCode
+          payload = decodeString(sequence, ip)
+          ip += payload[0]
+          @description = payload[1]
+        when uriOpCode
+          payload = decodeString(sequence, ip)
+          ip += payload[0]
+          @URI = payload[1]
+        when filenameOpCode
+          payload = decodeString(sequence, ip)
+          ip += payload[0]
+          @filename = payload[1]
         when attachmentPayloadOpCode
           payload = decodeBuffer(sequence, ip)
           ip += payload[0]
           @payloadAttachment = payload[1]
         when payloadMD5OpCode
           payload = decodeBytes(sequence, ip, 16)
-          op += payload[0]
+          ip += payload[0]
           @payloadMD5 = payload[1].toString("hex")
         when payloadSHA1OpCode
           payload = decodeBytes(sequence, ip, 20)
@@ -293,6 +318,9 @@ rl.question "What is the magnet link? ", (magnet) ->
       sequence.addPayloadInline magnet
       sequence.addName name
       sequence.addKeywords keywords
+      sequence.addPayloadMD5 magnet
+      sequence.addPayloadSHA1 magnet
+      sequence.addPayloadSHA256 magnet
       buf = new Buffer(sequence.toString(), "hex")
       addresses = encodeAddresses(buf, 14)
       decodedBuf = new Buffer(addresses.length * 20)
@@ -308,5 +336,4 @@ rl.question "What is the magnet link? ", (magnet) ->
       console.log decoder.payloadInline
       console.log decoder.name
       console.log decoder.keywords
-      console.log decoder.payloadSHA256
       rl.close()
