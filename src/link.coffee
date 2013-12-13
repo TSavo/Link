@@ -215,7 +215,6 @@ class LinkSequenceDecoder
     sequence = new Buffer(addresses.length * 20)
     sequence.fill 0x00
     for x of addresses
-      console.log addresses[x]
       new Buffer(bytesToHex(decodeBase58(addresses[x]).slice(1)), "hex").copy sequence, x * 20
     startSequence= new Buffer(4)
     sequence.copy startSequence

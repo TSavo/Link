@@ -12,7 +12,8 @@
   },
   "main": "lib/link.js",
   "dependencies": {
-    "jsbn": "~0.0.0"
+    "jsbn": "~0.0.0",
+    "bitcoin": "~2.0.0"
   },
   "repository": {
     "type": "git",
