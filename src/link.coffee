@@ -1,7 +1,5 @@
 crypto = require("crypto")
-fs = require("fs")
-readline = require("readline")
-BigInteger = require('jsbn')
+BigInteger = require("jsbn")
 
 alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 
@@ -67,7 +65,6 @@ encodeBase58 = (input) ->
       break
     i++
   chars.join ""
-  
 decodeBase58 = (input) ->
   bi = BigInteger.valueOf(0)
   leadingZerosNum = 0
@@ -95,7 +92,6 @@ decimalToHex = (d, padding) ->
   padding = (if typeof (padding) is "undefined" or padding is null then 2 else padding)
   hex = "0" + hex  while hex.length < padding
   hex
-  
 hashBuffer = (algo, buffer) ->
   hash = crypto.createHash algo
   hash.update buffer
@@ -164,7 +160,11 @@ class LinkSequenceBuilder
   addMimeType: (mimeType) ->
     @str += @encodeMimeType mimeType
   addKeywords: (keywords) ->
-    @str += @encodeKeywords(keywords)
+    @str += @encodeKeywords keywords
+  addOriginalCreationDate: (date) ->
+    @str += @encodeOriginalCreationDate date
+  addLastModifiedDate: (date) ->
+    @str += @encodeLastModifiedDate date
   addPayloadInline: (payload) ->
     @str += @encodePayloadInline payload
   addPayloadAttachment: (buf) ->
@@ -175,7 +175,8 @@ class LinkSequenceBuilder
     @str += @encodePayloadSHA1Buffer buf
   addPayloadSHA256: (buf) ->
     @str += @encodePayloadSHA256Buffer buf
-
+  getAddresses: (version) ->
+    encodeAddresses new Buffer(@toString(), "hex"), version
   encodeBuffer: (buf) ->
     decimalToHex(buf.length, 4) + buf.toString("hex");
   encodeString: (str) ->
@@ -204,13 +205,22 @@ class LinkSequenceBuilder
     opCodes.keywordsOpCode + @encodeString(str)
   encodeMimeType: (str) ->
     opCodes.mimeTypeOpCode + @encodeString(str)
+  encodeOriginalCreationDate: (date) ->
+    opCodes.originalCreationDateOpCode + decimalToHex(date.getTime(), 12)
+  encodeLastModifiedDate: (date) ->
+    opCodes.lastModifiedDateOpCode + decimalToHex(date.getTime(), 12)
     
 class LinkSequenceDecoder
-  constructor: (@sequence) ->
+  constructor: (addresses) ->
+    sequence = new Buffer(addresses.length * 20)
+    sequence.fill 0x00
+    for x of addresses
+      console.log addresses[x]
+      new Buffer(bytesToHex(decodeBase58(addresses[x]).slice(1)), "hex").copy sequence, x * 20
     startSequence= new Buffer(4)
     sequence.copy startSequence
     firstFour = startSequence.toString("utf-8")
-    throw new Exception("First 4 bytes were: " + firstFour)  unless firstFour is "Link"
+    throw "First 4 bytes were: " + firstFour unless firstFour is "Link"
     ip = 4
     running = true
     while running 
@@ -260,6 +270,12 @@ class LinkSequenceDecoder
           payload = @decodeBytes(sequence, ip, 32)
           ip += payload[0]
           @payloadSHA256 = payload[1].toString("hex")
+        when opCodes.originalCreationDateOpCode
+          @originalCreationDate = @decodeDate(sequence, ip)
+          ip += 6
+        when opCodes.lastModifiedDateOpCode
+          @lastModifiedDate = @decodeDate(sequence, ip)
+          ip += 6;
         when opCodes.endSequence
           running = false
   verify: ->
@@ -291,45 +307,14 @@ class LinkSequenceDecoder
     p = new Buffer(length)
     buffer.copy p, 0, ip
     [length, p]
- 
-    
-rl = readline.createInterface(
-  input: process.stdin
-  output: process.stdout
-)
-rl.question "Payload: ", (magnet) ->
-  rl.question "Name: ", (name) ->
-    rl.question "Keywords: ", (keywords) ->
-      sequence = new LinkSequenceBuilder()
-      sequence.addPayloadInline magnet
-      sequence.addName name
-      sequence.addKeywords keywords
-      sequence.addPayloadMD5 magnet
-      sequence.addPayloadSHA1 magnet
-      sequence.addPayloadSHA256 magnet
-      buf = new Buffer(sequence.toString(), "hex")
-      addresses = encodeAddresses(buf, 14)
-      decodedBuf = new Buffer(addresses.length * 20)
-      decodedBuf.fill 0x00
-      for x of addresses
-        console.log addresses[x]
-        new Buffer(bytesToHex(decodeBase58(addresses[x]).slice(1)), "hex").copy decodedBuf, x * 20
-      console.log decodedBuf.toString("hex")
-      decoder = new LinkSequenceDecoder(decodedBuf)
-      errors = decoder.verify()
-      if errors.length > 0
-        console.log error for error in errors
-      console.log decoder.payloadInline
-      console.log decoder.name
-      console.log decoder.keywords
-      rl.close()
+  decodeDate: (buffer, ip) ->
+    buf = new Buffer 6
+    buffer.copy buf, 0, ip
+    d = new Date parseInt buf.toString("hex"), 16
       
-if typeof exports 
+if exports? 
   exports.LinkSequenceBuilder = module.exports.LinkSequenceBuilder = LinkSequenceBuilder;
   exports.LinkSequenceEncoder = module.exports.LinkSequenceDecoder = LinkSequenceDecoder;
   exports.opCodes = module.exports.opCodes = opCodes;
-else
-  @LinkSequenceBuilder = LinkSequenceBuilder;
-  @LinkSequenceDecoder = LinkSequenceDecoder;
-  @opCodes = opCodes;
+
   
