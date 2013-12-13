@@ -1,0 +1,10 @@
+{ "name": "link",
+ "description": "Link - The Blockchain File Sharing Protocol",
+ "author": "Travis Savo",
+ "version": "0.0.1",
+ "readmeFilename": "README.md",
+ "devDependencies": { "coffee-script": "~1.6.3" },
+ "scripts": { "prepublish": "coffee -o lib/ -c src/link.coffee" },
+ "main": "lib/link.js",
+ "dependencies": { "jsbn": "0.0.0" }
+  }
