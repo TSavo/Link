@@ -97,8 +97,6 @@ hashBuffer = (algo, buffer) ->
   hash.update buffer
   hash.digest()  
   
-makeAddress = (addressBuffer) ->
-  base58 hexToBytes(addressBuffer.toString("hex"))
 encodeAddress = (buf, version) ->
   version = version or 0x00
   padding = new Buffer(21) # version byte + 20 bytes = 21
@@ -315,5 +313,8 @@ if exports?
   exports.LinkSequenceBuilder = module.exports.LinkSequenceBuilder = LinkSequenceBuilder;
   exports.LinkSequenceEncoder = module.exports.LinkSequenceDecoder = LinkSequenceDecoder;
   exports.opCodes = module.exports.opCodes = opCodes;
+  exports.decodeBase58 = decodeBase58
+  exports.encodeBase58 = encodeBase58
+  exports.bytesToHex = bytesToHex
 
   

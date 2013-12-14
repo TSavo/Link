@@ -39,7 +39,7 @@ rl.question "Payload: ", (magnet) ->
       @outs = {}
       for x in addresses
         @outs[x] = 0.00000001
-      
+      fee = 0.1
       total = addresses.length * 0.00000001
       client.listUnspent 0, (err, unspent) ->
         @useable = undefined
