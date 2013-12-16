@@ -8,11 +8,8 @@
 4 verbose node symlink C:\Program Files\nodejs\\node.exe
 5 error Error: Git working directory not clean.
 5 error M lib/link.js
-5 error M lib/linkTest.js
-5 error M package.json
-5 error M src/link.coffee
-5 error RM src/linkTest.coffee -> src/linkPublishTest.coffee
-5 error M src/linkReadTest.coffee
+5 error M lib/linkReadTest.js
+5 error M npm-debug.log
 5 error     at C:\Program Files\nodejs\node_modules\npm\lib\version.js:97:35
 5 error     at ChildProcess.exithandler (child_process.js:635:7)
 5 error     at ChildProcess.EventEmitter.emit (events.js:98:17)
