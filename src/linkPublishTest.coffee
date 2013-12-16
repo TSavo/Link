@@ -6,7 +6,7 @@ client = new bitcoin.Client
   port: 8332
   user: 'Kevlar'
   pass: 'zabbas'
-client.version = 14
+  version: 14
 
 rl = readline.createInterface(
   input: process.stdin

@@ -5,7 +5,7 @@ Search = (db) ->
     pattern=new RegExp(".*" + keyword + ".*", "ig")
     stream.on 'data', (data) ->
       for key, value of data
-        if pattern.test(value)
+        if pattern.test value
           results.push data
           break
     stream.on "close", ()->

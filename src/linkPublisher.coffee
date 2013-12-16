@@ -4,7 +4,7 @@ class LinkPublisher
   constructor:(client)->
     @client = client
   publish: (message, fee, callback) ->
-    sequence = new LinkSequenceBuilder(@client.version)
+    sequence = new LinkSequenceBuilder(@client.opts.version)
     sequence.addPayloadInline message.payloadInline if message.payloadInline?
     sequence.addName message.name if message.name?
     sequence.addKeywords message.keywords if message.keywords?
