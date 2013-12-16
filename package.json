@@ -10,7 +10,7 @@
   "scripts": {
     "prepublish": "coffee -o lib/ -c src/"
   },
-  "main": "lib/link.js",
+  "main": "lib/index.js",
   "dependencies": {
     "jsbn": "~0.0.0",
     "bitcoin": "~2.0.0",

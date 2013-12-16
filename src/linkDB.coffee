@@ -71,5 +71,9 @@ getDB = (name, client)->
   require("./search").search(db)
   getLatest(db, client)
   dbMap[name] = db
-      
-exports.db = getDB
+  
+queryDB = (name, client, keywords, callback)->
+  getDB(name, client).search keywords, callback
+  
+exports.getDB = getDB
+exports.queryDB = queryDB
