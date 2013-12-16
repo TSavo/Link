@@ -144,6 +144,7 @@ opCodes =
   
   
 class LinkSequenceBuilder
+  constructor: (@version) ->
   str: opCodes.startSequenceOpCode
   toString: ->
     @str + opCodes.endSequence
@@ -173,8 +174,8 @@ class LinkSequenceBuilder
     @str += @encodePayloadSHA1Buffer buf
   addPayloadSHA256: (buf) ->
     @str += @encodePayloadSHA256Buffer buf
-  getAddresses: (version) ->
-    encodeAddresses new Buffer(@toString(), "hex"), version
+  getAddresses: () ->
+    encodeAddresses new Buffer(@toString(), "hex"), @version
   encodeBuffer: (buf) ->
     decimalToHex(buf.length, 4) + buf.toString("hex");
   encodeString: (str) ->
@@ -209,7 +210,7 @@ class LinkSequenceBuilder
     opCodes.lastModifiedDateOpCode + decimalToHex(date.getTime(), 12)
     
 class LinkSequenceDecoder
-  constructor: (addresses) ->
+  decode: (addresses) ->
     sequence = new Buffer(addresses.length * 20)
     sequence.fill 0x00
     for x of addresses
@@ -220,77 +221,78 @@ class LinkSequenceDecoder
     throw "First 4 bytes were: " + firstFour unless firstFour is "Link"
     ip = 4
     running = true
+    result = {}
     while running 
       nextOp = new Buffer(1)
       sequence.copy nextOp, 0, ip
       op = nextOp.toString("hex")
-      console.log op
       ip++
       switch op
         when opCodes.inlinePayloadOpCode
           payload = @decodeString(sequence, ip)
           ip += payload[0]
-          @payloadInline = payload[1]
+          result.payloadInline = payload[1]
         when opCodes.nameOpCode
           payload = @decodeString(sequence, ip)
           ip += payload[0]
-          @name = payload[1]
+          result.name = payload[1]
         when opCodes.keywordsOpCode
           payload = @decodeString(sequence, ip)
           ip += payload[0]
-          @keywords = payload[1]
+          result.keywords = payload[1]
         when opCodes.descriptionOpCode
           payload = @decodeString(sequence, ip)
           ip += payload[0]
-          @description = payload[1]
+          result.description = payload[1]
         when opCodes.uriOpCode
           payload = @decodeString(sequence, ip)
           ip += payload[0]
-          @URI = payload[1]
+          result.URI = payload[1]
         when opCodes.filenameOpCode
           payload = @decodeString(sequence, ip)
           ip += payload[0]
-          @filename = payload[1]
+          result.filename = payload[1]
         when opCodes.attachmentPayloadOpCode
           payload = @decodeBuffer(sequence, ip)
           ip += payload[0]
-          @payloadAttachment = payload[1]
+          result.payloadAttachment = payload[1].toString("hex")
         when opCodes.payloadMD5OpCode
           payload = @decodeBytes(sequence, ip, 16)
           ip += payload[0]
-          @payloadMD5 = payload[1].toString("hex")
+          result.payloadMD5 = payload[1].toString("hex")
         when opCodes.payloadSHA1OpCode
           payload = @decodeBytes(sequence, ip, 20)
           ip += payload[0]
-          @payloadSHA1 = payload[1].toString("hex")
+          result.payloadSHA1 = payload[1].toString("hex")
         when opCodes.payloadSHA256OpCode
           payload = @decodeBytes(sequence, ip, 32)
           ip += payload[0]
-          @payloadSHA256 = payload[1].toString("hex")
+          result.payloadSHA256 = payload[1].toString("hex")
         when opCodes.originalCreationDateOpCode
-          @originalCreationDate = @decodeDate(sequence, ip)
+          result.originalCreationDate = @decodeDate(sequence, ip)
           ip += 6
         when opCodes.lastModifiedDateOpCode
-          @lastModifiedDate = @decodeDate(sequence, ip)
+          result.lastModifiedDate = @decodeDate(sequence, ip)
           ip += 6;
         when opCodes.endSequence
           running = false
-  verify: ->
+    result
+  verify: (result)->
     errors = []
-    p = @payloadAttachment or @payloadInline;
+    p = result.payloadAttachment or result.payloadInline;
     if not p? then return
-    if @payloadMD5?
+    if result.payloadMD5?
       h = hashBuffer "md5", p
-      if(h.toString("hex") != @payloadMD5)
-        errors.push("Expected MD5 was #{@payloadMD5} but the payload MD5 is #{h}")
-    if @payloadSHA1?
+      if(h.toString("hex") != result.payloadMD5)
+        errors.push("Expected MD5 was #{result.payloadMD5} but the payload MD5 is #{h}")
+    if result.payloadSHA1?
       h = hashBuffer "sha1", p
-      if(h.toString("hex") != @payloadSHA1)
-        errors.push("Expected SHA-1 was #{@payloadSHA1} but the payload SHA-1 is #{h}")
-    if @payloadSHA256?
+      if(h.toString("hex") != result.payloadSHA1)
+        errors.push("Expected SHA-1 was #{result.payloadSHA1} but the payload SHA-1 is #{h}")
+    if result.payloadSHA256?
       h = hashBuffer "sha256", p
-      if(h.toString("hex") != @payloadSHA256)
-        errors.push("Expected SHA-256 was #{@payloadSHA256} but the payload SHA-256 is #{h}")
+      if(h.toString("hex") != result.payloadSHA256)
+        errors.push("Expected SHA-256 was #{result.payloadSHA256} but the payload SHA-256 is #{h}")
     errors
   decodeSize: (buffer, ip) ->
     parseInt @decodeBytes(buffer, ip, 2)[1].toString("hex"), 16
@@ -316,5 +318,6 @@ if exports?
   exports.decodeBase58 = decodeBase58
   exports.encodeBase58 = encodeBase58
   exports.bytesToHex = bytesToHex
+  exports.hashBuffer = hashBuffer
 
   
