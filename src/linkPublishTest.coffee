@@ -20,5 +20,5 @@ rl.question "Payload: ", (magnet) ->
         payloadInline:magnet
         name:name
         keywords:keywords
-      , 0.01, console.log
+      , console.log
       rl.close()

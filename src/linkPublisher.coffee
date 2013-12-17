@@ -3,7 +3,7 @@ LinkSequenceBuilder = require("./link").LinkSequenceBuilder
 class LinkPublisher
   constructor:(client)->
     @client = client
-  publish: (message, fee, callback) ->
+  publish: (message, callback) ->
     sequence = new LinkSequenceBuilder(@client.opts.version)
     sequence.addPayloadInline message.payloadInline if message.payloadInline?
     sequence.addName message.name if message.name?
@@ -16,7 +16,7 @@ class LinkPublisher
     outs = {}
     for x in addresses
       outs[x] = 0.00000001
-    fee = 0.01 if not fee?
+    fee = addresses.length * 0.002
     total = (addresses.length * 0.00000001) + fee
     client.listUnspent 0, (err, unspent) ->
       useable = undefined
