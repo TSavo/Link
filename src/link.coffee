@@ -135,6 +135,7 @@ opCodes =
   filenameOpCode: "14"
   originalCreationDateOpCode: "15"
   lastModifiedDateOpCode: "16"
+  licenseOpCode: "17"
 
   referencesTransactionOpCode: "F1"
   replacesTransactionOpCode: "F2"
@@ -174,6 +175,8 @@ class LinkSequenceBuilder
     @str += @encodePayloadSHA1Buffer buf
   addPayloadSHA256: (buf) ->
     @str += @encodePayloadSHA256Buffer buf
+  addLicense:(license)->
+    @str += @encodeLicense license
   getAddresses: () ->
     encodeAddresses new Buffer(@toString(), "hex"), @version
   encodeBuffer: (buf) ->
@@ -208,6 +211,8 @@ class LinkSequenceBuilder
     opCodes.originalCreationDateOpCode + decimalToHex(date.getTime(), 12)
   encodeLastModifiedDate: (date) ->
     opCodes.lastModifiedDateOpCode + decimalToHex(date.getTime(), 12)
+  encodeLicense: (license) ->
+    opcodes.licenseOpCode + @encodeString(str)
     
 class LinkSequenceDecoder
   decode: (addresses) ->
@@ -274,6 +279,10 @@ class LinkSequenceDecoder
         when opCodes.lastModifiedDateOpCode
           result.lastModifiedDate = @decodeDate(sequence, ip)
           ip += 6;
+        when opCodes.licenseOpCode
+          payload = @decodeString(sequence, ip)
+          ip += payload[0]
+          result.license = payload[1]
         when opCodes.endSequence
           running = false
     result
