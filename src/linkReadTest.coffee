@@ -5,8 +5,9 @@ client = new bitcoin.Client
   user: 'Kevlar'
   pass: 'zabbas'
 
-db = require('./linkDB').db("Feathercoin", client)
+db = require('./linkDB').getDB("Feathercoin", client)
     
-db.search "pirate", console.log
-
+setInterval ()->
+  db.search "pirate", console.log
+, 100
   

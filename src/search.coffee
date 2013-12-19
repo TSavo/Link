@@ -6,9 +6,7 @@ Search = (db) ->
     stream.on 'data', (data) ->
       for key, value of data
         if pattern.test value
-          results.push data
+          callback data
           break
-    stream.on "close", ()->
-      callback results
 
 exports.search = Search
