@@ -33,8 +33,8 @@ class LinkPublisher
       outs[useable.address] = useable.amount - total
       client.createRawTransaction [useable], outs, (err, rawtx)->
         client.decodeRawTransaction rawtx, (error, decoded)->
-          client.signRawTransaction rawtx, [useable], (error, decoded) ->
-            console.log decoded
+          client.signRawTransaction decoded, [useable], (error, decoded) ->
+            console.log error, decoded
             client.sendRawTransaction decoded.hex, (error, result) ->
               callback(result) if callback?
 
