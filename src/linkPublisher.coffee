@@ -16,7 +16,7 @@ class LinkPublisher
     sequence.getAddresses()
  
   getMessageCost: (addresses)->
-    (addresses.length * 0.002) + (addresses.length * 0.00000001)
+    (addresses.length * 0.005) + (addresses.length * 0.00000001)
       
   publish: (message, callback) ->
     addresses = @encodeAddresses message
@@ -33,8 +33,7 @@ class LinkPublisher
       outs[useable.address] = useable.amount - total
       client.createRawTransaction [useable], outs, (err, rawtx)->
         client.decodeRawTransaction rawtx, (error, decoded)->
-          client.signRawTransaction decoded, [useable], (error, decoded) ->
-            console.log error, decoded
+          client.signRawTransaction rawtx, [useable], (error, decoded) ->
             client.sendRawTransaction decoded.hex, (error, result) ->
               callback(result) if callback?
 
