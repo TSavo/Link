@@ -16,7 +16,7 @@ class LinkPublisher
     sequence.getAddresses()
  
   getMessageCost: (addresses)->
-    (addresses.length * 0.005) + (addresses.length * 0.00000001)
+    ((addresses.length * 0.02) + (addresses.length * 0.00000001)).toFixed(8)
       
   publish: (message, callback) ->
     addresses = @encodeAddresses message
@@ -28,9 +28,9 @@ class LinkPublisher
     client.listUnspent 0, (err, unspent) ->
       useable = undefined
       for tx in unspent
-        useable = tx if tx.amount >= total
-      callback("No unspent") unless useable?
-      outs[useable.address] = useable.amount - total
+        useable = tx if tx.amount.toFixed(8) >= total.toFixed(8) && (!useable? || useable.amount.toFixed(8) > tx.amount.toFixed(8))
+      return callback("No unspent") unless useable?
+      outs[useable.address] = useable.amount.toFixed(8) - total.toFixed(8) if useable.amount.toFixed(8) > total.toFixed(8)
       client.createRawTransaction [useable], outs, (err, rawtx)->
         client.decodeRawTransaction rawtx, (error, decoded)->
           client.signRawTransaction rawtx, [useable], (error, decoded) ->
