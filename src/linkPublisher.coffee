@@ -28,9 +28,9 @@ class LinkPublisher
     client.listUnspent 0, (err, unspent) ->
       useable = undefined
       for tx in unspent
-        useable = tx if tx.amount.toFixed(8) >= total.toFixed(8) && (!useable? || useable.amount.toFixed(8) > tx.amount.toFixed(8))
+        useable = tx if parseFloat(tx.amount.toFixed(8)) >= parseFloat(total.toFixed(8)) && (!useable? || parseFloat(useable.amount.toFixed(8)) > parseFloat(tx.amount.toFixed(8)))
       return callback("No unspent") unless useable?
-      outs[useable.address] = useable.amount.toFixed(8) - total.toFixed(8) if useable.amount.toFixed(8) > total.toFixed(8)
+      outs[useable.address] = useable.amount) - total if useable.amount > total
       client.createRawTransaction [useable], outs, (err, rawtx)->
         client.decodeRawTransaction rawtx, (error, decoded)->
           client.signRawTransaction rawtx, [useable], (error, decoded) ->
