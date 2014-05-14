@@ -18,7 +18,7 @@
     "levelup": "~0.18.2",
     "leveldown": "~0.10.2",
     "level-sublevel": "~5.2.0",
-    "level-search": "~1.6.1"
+    "level-search": "~1.8.0"
   },
   "repository": {
     "type": "git",
