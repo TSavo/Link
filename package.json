@@ -14,7 +14,7 @@
   "dependencies": {
     "jsbn": "~0.0.0",
     "bitcoin": "~2.1.2",
-    "buffertools": "~2.0.1",
+    "buffertools": "~2.1.2",
     "levelup": "~0.18.2",
     "leveldown": "~0.10.2",
     "level-sublevel": "~5.2.0",
