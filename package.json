@@ -4,7 +4,7 @@
   "author": "Travis Savo <evilgenius@nefariousplan.com>",
   "version": "0.1.0",
   "devDependencies": {
-    "coffee-script": "~1.6.3",
+    "coffee-script": "~1.7.1",
     "readline": "~0.0.3"
   },
   "scripts": {
