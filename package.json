@@ -2,7 +2,7 @@
   "name": "blockchain-link",
   "description": "Link - The Blockchain File Sharing Protocol",
   "author": "Travis Savo <evilgenius@nefariousplan.com>",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "devDependencies": {
     "coffee-script": "~1.7.1",
     "readline": "~0.0.3"
